@@ -2,10 +2,12 @@
 // SPDX-FileCopyrightText: 2023 Fabian Köhler <me@fkoehler.org>
 
 #include "app.h"
+#include "taildrop_receiver.h"
 #include <KSharedConfig>
 #include <KWindowConfig>
 #include <QClipboard>
 #include <QGuiApplication>
+#include <QList>
 #include <QMenu>
 #include <QQuickWindow>
 
@@ -13,39 +15,28 @@
 
 Q_LOGGING_CATEGORY(logcat_app, "org.fkoehler.KTailctl.App")
 
-App::App(Tailscale *tailscale, QObject *parent)
+App::App(QObject *parent)
     : QObject(parent)
-    , mTailscale(tailscale)
     , mConfig(KTailctlConfig::self())
     , mPeerDetails(new Peer(this))
-    , mPeerModel(new PeerModel(this))
     , mPeerProxyModel(new QSortFilterProxyModel(this))
-    , mExitNodeModel(new ExitNodeModel(this))
-    , mTrayIcon(new TrayIcon(tailscale, this))
+    , mTrayIcon(new TrayIcon(this))
 {
-    mTailscale->setParent(this);
-
-    QObject::connect(tailscale->status(), &Status::refreshed, mPeerModel, &PeerModel::updatePeers);
-    QObject::connect(tailscale->status(), &Status::refreshed, mExitNodeModel, &ExitNodeModel::updatePeers);
     // QObject::connect(tailscale->status(), &Status::refreshed, &mPeerDetails, &Peer::updateFromStatus);
-    QObject::connect(tailscale->status(), &Status::backendStateChanged, mTrayIcon, &TrayIcon::regenerate);
+    QObject::connect(Tailscale::instance(), &Tailscale::backendStateChanged, mTrayIcon, &TrayIcon::regenerate);
     QObject::connect(mTrayIcon, &TrayIcon::quitClicked, this, &App::quitApp);
 
     if (KTailctlConfig::peerFilter() == "UNINITIALIZED") {
-        tailscale->status()->refresh();
-        const auto domain = mTailscale->status()->self()->dnsName().section('.', 1);
+        Tailscale::instance()->refresh();
+        const auto domain = Tailscale::instance()->self()->dnsName().section('.', 1);
         mPeerProxyModel->setFilterRegularExpression(domain);
         KTailctlConfig::setPeerFilter(domain);
         mConfig->save();
     }
-    mPeerProxyModel->setSourceModel(mPeerModel);
+    mPeerProxyModel->setSourceModel(Tailscale::instance()->peerModel());
     mPeerProxyModel->setFilterRole(PeerModel::DnsNameRole);
 }
 
-Tailscale *App::tailscale()
-{
-    return mTailscale;
-}
 KTailctlConfig *App::config()
 {
     return mConfig;
@@ -57,10 +48,6 @@ Peer *App::peerDetails()
 QSortFilterProxyModel *App::peerModel()
 {
     return mPeerProxyModel;
-}
-ExitNodeModel *App::exitNodeModel()
-{
-    return mExitNodeModel;
 }
 TrayIcon *App::trayIcon()
 {
@@ -86,10 +73,10 @@ void App::saveWindowGeometry(QQuickWindow *window, const QString &group)
 
 void App::setPeerDetails(const QString &id)
 {
-    const auto *pos = std::find_if(mTailscale->status()->peers().begin(), mTailscale->status()->peers().end(), [&id](const Peer *peer) {
+    auto pos = std::find_if(Tailscale::instance()->peers().begin(), Tailscale::instance()->peers().end(), [&id](Peer *peer) {
         return peer->id() == id;
     });
-    if (pos == mTailscale->status()->peers().end()) {
+    if (pos == Tailscale::instance()->peers().end()) {
         qCWarning(logcat_app) << "Peer" << id << "not found";
         return;
     }

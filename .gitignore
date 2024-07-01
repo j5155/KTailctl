@@ -5,10 +5,21 @@
 build-dir/
 build/
 cmake-build-*/
-tailscale/
+/tailscale/
 tailwrap-vendor-*.tar.gz
 .craft/
 craft/
 _build/
 .DS_Store
 .cache/
+result
+.direnv
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml

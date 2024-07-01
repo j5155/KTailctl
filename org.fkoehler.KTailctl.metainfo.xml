@@ -28,6 +28,47 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.16.2" date="2024-06-24" urgency="critical">
+      <description>
+        <p>Fixes KTailctl not being able to run at all.</p>
+      </description>
+      <url>https://github.com/f-koehler/KTailctl/releases/tag/v0.16.2</url>
+      <artifacts>
+        <artifact type="source">
+          <location>https://github.com/f-koehler/KTailctl/archive/refs/tags/v0.16.2.tar.gz</location>
+        </artifact>
+      </artifacts>
+    </release>
+    <release version="0.16.1" date="2024-06-24" urgency="low">
+      <description>
+        <p>Internal refactoring and a lot of dependency updates.</p>
+      </description>
+      <url>https://github.com/f-koehler/KTailctl/releases/tag/v0.16.1</url>
+      <artifacts>
+        <artifact type="source">
+          <location>https://github.com/f-koehler/KTailctl/archive/refs/tags/v0.16.1.tar.gz</location>
+        </artifact>
+        <artifact type="source">
+          <location>
+            https://github.com/f-koehler/KTailctl/releases/download/v0.16.1/tailwrap-vendor-v0.16.1.tar.gz</location>
+        </artifact>
+      </artifacts>
+    </release>
+    <release version="0.16.0" date="2024-04-02" urgency="medium">
+      <description>
+        <p>Cleanup peer list view a bit and upgrade a lot of underlying software libraries.</p>
+      </description>
+      <url>https://github.com/f-koehler/KTailctl/releases/tag/v0.16.0</url>
+      <artifacts>
+        <artifact type="source">
+          <location>https://github.com/f-koehler/KTailctl/archive/refs/tags/v0.16.0.tar.gz</location>
+        </artifact>
+        <artifact type="source">
+          <location>
+            https://github.com/f-koehler/KTailctl/releases/download/v0.16.0/tailwrap-vendor-v0.16.0.tar.gz</location>
+        </artifact>
+      </artifacts>
+    </release>
     <release version="0.15.0" date="2024-02-18" urgency="low">
       <description>
         <p>Fix right click behavior of tray menu and rework peer list page.</p>
